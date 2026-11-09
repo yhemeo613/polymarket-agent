@@ -70,8 +70,7 @@ export class MarketFilterService {
         const out = await this.llm.chatJSON({
           system: SCREEN_SYSTEM,
           user: SCREEN_USER_TEMPLATE(lines),
-          schema: ScreenOut,
-          maxTokens: 300,
+          schema: ScreenOut, // maxTokens 用全局 LLM_MAX_TOKENS（截断过 300 的教训）
         });
         const allowed = new Set(out.pass.filter((i) => i >= 1 && i <= ranked.length).map((i) => i - 1));
         const filtered = ranked.filter((_, idx) => allowed.has(idx));
