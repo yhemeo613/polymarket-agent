@@ -42,7 +42,7 @@ export class CycleReporter {
 
   /** 双写输出：控制台（彩色）+ data/cycles.log（纯文本 UTF-8） */
   private out(colored: string): void {
-    this.out(colored);
+    console.log(colored);
     appendCycleLog(colored.replace(ANSI_RE, ''));
   }
 
