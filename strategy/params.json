@@ -1,0 +1,19 @@
+{
+  "note": "人工管辖参数（LLM 无权修改；其建议写入 proposals/ 目录）。生效阈值以 .env 为准，本文件仅作对照记录与人工调整备忘。",
+  "soft_params": {
+    "min_edge": "env: MIN_EDGE=0.02",
+    "kelly_fraction": "env: KELLY_FRACTION=0.25",
+    "take_profit_at": "env: TAKE_PROFIT_AT=0.95",
+    "stop_loss_at": "env: STOP_LOSS_AT=0.05",
+    "scan_limit": "env: SCAN_LIMIT=200",
+    "forecast_batch": "env: FORECAST_BATCH=12"
+  },
+  "risk_hard_caps": {
+    "max_single_pct": 0.02,
+    "max_market_pct": 0.05,
+    "max_total_pct": 0.5,
+    "max_positions": 20,
+    "daily_loss_halt": 0.05,
+    "drawdown_halt": 0.2
+  }
+}
