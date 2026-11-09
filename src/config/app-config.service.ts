@@ -49,6 +49,7 @@ export class AppConfigService {
   // 调度
   get cycleCron() { return this.env.CYCLE_CRON; }
   get lightCron() { return this.env.LIGHT_CRON; }
+  get runOnStart() { return this.env.CYCLE_RUN_ON_START ?? true; }
 
   // 扫描
   get scanLimit() { return this.env.SCAN_LIMIT; }

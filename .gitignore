@@ -5,3 +5,4 @@ data/
 *.log
 proposals/
 .DS_Store
+data/cycles.log

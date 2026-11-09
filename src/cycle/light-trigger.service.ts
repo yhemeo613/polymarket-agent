@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import chalk from 'chalk';
-import { CycleReporter } from '../cli/cycle.reporter';
+import { CycleReporter, appendCycleLog } from '../cli/cycle.reporter';
 import { AppConfigService } from '../config/app-config.service';
 import { OrderBookService } from '../polymarket/orderbook.service';
 import { PortfolioService } from '../portfolio/portfolio.service';
@@ -36,7 +36,9 @@ export class LightTriggerService {
 
     const t = CycleReporter.stamp();
     if (positions.length) {
-      console.log(`\n${chalk.blue(`[轻触发 ${t}]`)} ${chalk.bold(`持仓监控（${positions.length} 个）`)}`);
+      const head = `[轻触发 ${t}] 持仓监控（${positions.length} 个）`;
+      console.log(`\n${chalk.blue(head)}`);
+      appendCycleLog(head);
     }
 
     for (const p of positions) {
@@ -45,19 +47,24 @@ export class LightTriggerService {
         const mid = this.orderBook.midPrice(book);
         if (mid == null || this.orderBook.isPlaceholder(book)) continue;
         const label = (p.question ?? p.tokenId.slice(0, 12)).slice(0, 40);
+        let lineTxt: string;
         if (mid >= this.config.takeProfitAt) {
           await this.broker.closePosition(p, `take_profit@${mid.toFixed(3)}`, null);
           closed++;
+          lineTxt = `★ 止盈平仓 ${label} · mid=${mid.toFixed(3)} 成本=${p.avgPrice.toFixed(3)}`;
           console.log(`  ${chalk.green('★ 止盈平仓')} ${label} · mid=${mid.toFixed(3)} 成本=${p.avgPrice.toFixed(3)}`);
           await this.alert.alert('info', `止盈平仓 ${p.question?.slice(0, 40) ?? p.tokenId.slice(0, 10)}`, `mid=${mid.toFixed(3)}`);
         } else if (mid <= this.config.stopLossAt) {
           await this.broker.closePosition(p, `stop_loss@${mid.toFixed(3)}`, null);
           closed++;
+          lineTxt = `★ 止损平仓 ${label} · mid=${mid.toFixed(3)} 成本=${p.avgPrice.toFixed(3)}`;
           console.log(`  ${chalk.red('★ 止损平仓')} ${label} · mid=${mid.toFixed(3)} 成本=${p.avgPrice.toFixed(3)}`);
           await this.alert.alert('warn', `止损平仓 ${p.question?.slice(0, 40) ?? p.tokenId.slice(0, 10)}`, `mid=${mid.toFixed(3)}`);
         } else {
+          lineTxt = `· ${label} · mid=${mid.toFixed(3)}（持有，成本 ${p.avgPrice.toFixed(3)}）`;
           console.log(`  ${chalk.gray('·')} ${label} · mid=${mid.toFixed(3)}（持有，成本 ${p.avgPrice.toFixed(3)}）`);
         }
+        appendCycleLog(`  ${lineTxt}`);
       } catch (err) {
         this.logger.warn(`持仓监控失败 #${p.id}: ${String(err).slice(0, 160)}`);
       }

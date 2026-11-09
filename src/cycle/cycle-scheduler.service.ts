@@ -35,5 +35,13 @@ export class CycleSchedulerService implements OnModuleInit {
     lightJob.start();
 
     this.logger.log(`调度已注册：主循环 "${this.config.cycleCron}"，轻触发 "${this.config.lightCron}"`);
+
+    // 启动即自动跑一轮（CYCLE_RUN_ON_START，默认 true）：立刻看到周期日志/验证管线
+    if (this.config.runOnStart) {
+      this.logger.log('CYCLE_RUN_ON_START=true —— 5 秒后自动运行一轮主循环');
+      setTimeout(() => {
+        void this.main.runOnce('cron').catch((err) => this.logger.error(`启动轮异常: ${String(err)}`));
+      }, 5000);
+    }
   }
 }

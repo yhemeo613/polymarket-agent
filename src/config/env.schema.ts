@@ -47,6 +47,8 @@ export const envSchema = z.object({
   // 调度（@nestjs/schedule 六位 cron：秒 分 时 日 月 周）
   CYCLE_CRON: z.string().default('0 7 * * * *'),
   LIGHT_CRON: z.string().default('0 */15 * * * *'),
+  /** 启动后 5 秒自动跑一轮主循环（便于立刻看到周期日志/验证管线） */
+  CYCLE_RUN_ON_START: boolLike.default(undefined as unknown as 'true' | 'false').optional(),
 
   // 扫描与预测
   SCAN_LIMIT: z.coerce.number().int().positive().default(200),

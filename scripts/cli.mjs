@@ -12,7 +12,11 @@
  *   watch [秒]                  持续轮询 status（默认 30s）
  * 环境变量：AGENT_URL（默认 http://localhost:3000）
  */
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 const BASE = process.env.AGENT_URL ?? 'http://localhost:3000';
+const CYCLES_LOG = resolve(process.cwd(), 'data/cycles.log');
 
 const C = {
   dim: (s) => `\x1b[2m${s}\x1b[0m`,
@@ -131,6 +135,17 @@ async function main() {
         await new Promise((r) => setTimeout(r, interval));
       }
     }
+    case 'logs': {
+      const n = Number(args[0] ?? 60);
+      if (!existsSync(CYCLES_LOG)) {
+        console.log(C.yellow(`暂无周期日志（${CYCLES_LOG}）—— 启动 agent 并跑完一轮后生成`));
+        break;
+      }
+      const lines = readFileSync(CYCLES_LOG, 'utf8').trimEnd().split('\n');
+      console.log(C.dim(`data/cycles.log 最近 ${Math.min(n, lines.length)} 行（共 ${lines.length} 行）\n`));
+      console.log(lines.slice(-n).join('\n'));
+      break;
+    }
     default:
       console.log(`polymarket-agent 运维 CLI
 
@@ -143,6 +158,7 @@ async function main() {
   ${C.cyan('kill on [理由]')}    置位 kill switch（紧急停止）
   ${C.cyan('kill off')}          解除 kill switch
   ${C.cyan('watch [秒]')}        持续刷新状态（默认 30s）
+  ${C.cyan('logs [行数]')}       查看周期详细日志尾部（默认 60 行，来自 data/cycles.log）
 
 提示: npm run cli -- status  等价  node scripts/cli.mjs status
 环境: AGENT_URL 可指定远端地址（默认 http://localhost:3000）`);
