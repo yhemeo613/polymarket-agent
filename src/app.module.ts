@@ -15,6 +15,7 @@ import { ExecutionModule } from './execution/execution.module';
 import { ForecastModule } from './forecast/forecast.module';
 import { EvolutionModule } from './evolution/evolution.module';
 import { AlertingModule } from './alerting/alerting.module';
+import { TelegramModule } from './telegram/telegram.module';
 import { CycleModule } from './cycle/cycle.module';
 import { StatusModule } from './status/status.module';
 
@@ -47,6 +48,7 @@ import { StatusModule } from './status/status.module';
     ForecastModule,
     EvolutionModule,
     AlertingModule,
+    TelegramModule,
     CycleModule,
     StatusModule,
   ],

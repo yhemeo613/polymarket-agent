@@ -103,6 +103,8 @@ edge 计算、费率、Kelly 仓位、下单、止盈止损、风控——全部
 横向支撑：L0 行情（Gamma API + CLOB 订单簿/WS 增量）· L6 审计（hash 链账本 + pino 日志）
 调度：动态 cron（主循环小时级 / 轻触发 15 分钟持仓监控·止盈止损）· ops API（无 UI）
 告警：Telegram Bot（周期摘要 / 平仓 / 熔断 / kill switch）
+交互：Telegram 交互菜单（点按钮或发命令查询状态/评分/持仓/最近预测、手动触发、紧急停止）
+     —— 仅响应 TELEGRAM_CHAT_ID 配置的会话，防止他人控制
 ```
 
 ### 关键机制对照表
@@ -185,6 +187,22 @@ npm start               # 默认 baseline/paper 模式
 | **孪生单** | `TWIN_ORDERS=true` + live 配置 | 每笔 paper 信号同步 $1 真实单，度量纸面↔实盘偏差（P2 阶段） |
 
 LLM 兼容任何 Anthropic 协议端点（官方 / 兼容网关），通过 `LLM_BASE_URL` + `LLM_AUTH_TOKEN` / `ANTHROPIC_API_KEY` 配置，模型名 `LLM_MODEL` 任意可换。
+
+### Telegram 交互菜单（推荐）
+
+配置 `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` 后，在 Telegram 里点常驻键盘按钮（或发命令）即可查询与控制：
+
+| 按钮 | 命令 | 内容 |
+|---|---|---|
+| 📊 状态 | `/status` | 模式/资金/回撤/预测统计/brier_delta/账本完整性/持仓 |
+| 📈 评分 | `/score` | 评分汇总 + 校准表 + min_edge 阈值扫描 |
+| 💼 持仓 | `/positions` | 当前持仓明细（成本口径） |
+| 🕘 最近预测 | `/recent` | 最近 5 条预测（p̂ vs 市场价 + 决策理由） |
+| 🔄 手动一轮 | `/run` | 立即触发主循环（完成后推送摘要） |
+| ⛔ 暂停 | `/kill` | 置位 kill switch（哨兵文件级，进程外等效） |
+| ▶️ 恢复 | `/resume` | 解除 kill switch |
+
+安全：bot 只响应 `TELEGRAM_CHAT_ID` 指定会话的消息，其他人发命令被静默忽略。
 
 ### Ops API（无 UI）
 

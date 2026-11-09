@@ -73,6 +73,11 @@ export class MainCycleService {
     return this.lastSummary;
   }
 
+  /** 主循环是否正在执行（供 Telegram bot / ops API 判断） */
+  get busy(): boolean {
+    return this.running;
+  }
+
   async runOnce(trigger: 'cron' | 'manual' | 'light' = 'cron'): Promise<CycleSummary | null> {
     if (this.running) {
       this.logger.warn('主循环已在运行，本次触发跳过（防重入锁）');
