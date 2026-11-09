@@ -20,5 +20,6 @@ import { StatusController } from './status.controller';
   ],
   providers: [StatusService],
   controllers: [StatusController],
+  exports: [StatusService],
 })
 export class StatusModule {}
